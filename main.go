@@ -8,9 +8,14 @@ import (
 )
 
 const (
-	Width  = 800
-	Height = 600
-	Title  = "Voxel Party"
+	Title = "Voxel Party"
+)
+
+var (
+	width   = 800
+	height  = 600
+	centerX = float64(width) / 2.0
+	centerY = float64(height) / 2.0
 )
 
 func block() {
@@ -101,9 +106,16 @@ var (
 	down     = false
 )
 
-func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.ModifierKey) {
-	rotation := glmath.Vec2{0.0, 0.0}
+func mouse(window *glfw.Window, xpos, ypos float64) {
+	window.SetCursorPosition(float64(width)/2.0, float64(height)/2.0)
 
+	dx := xpos - centerX
+	dy := ypos - centerY
+
+	camera.Rotate(glmath.Vec2{dy, dx})
+}
+
+func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.ModifierKey) {
 	if action == glfw.Press {
 		switch glfw.Key(k) {
 		case glfw.KeyW:
@@ -116,14 +128,6 @@ func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.M
 			right = true
 		case glfw.KeyEscape:
 			window.SetShouldClose(true)
-		case glfw.KeyUp:
-			rotation[0] -= 1.0
-		case glfw.KeyDown:
-			rotation[0] += 1.0
-		case glfw.KeyLeft:
-			rotation[1] -= 1.0
-		case glfw.KeyRight:
-			rotation[1] += 1.0
 		}
 	} else if action == glfw.Release {
 		switch glfw.Key(k) {
@@ -137,11 +141,14 @@ func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.M
 			right = false
 		}
 	}
-
-	camera.Rotate(rotation)
 }
 
 func reshape(window *glfw.Window, width, height int) {
+	width = width
+	height = height
+	centerX = float64(width) / 2.0
+	centerY = float64(height) / 2.0
+
 	h := float64(height) / float64(width)
 
 	znear := 5.0
@@ -158,7 +165,7 @@ func reshape(window *glfw.Window, width, height int) {
 }
 
 func Init() {
-	pos := []float32{5.0, 5.0, 10.0, 0.0}
+	pos := []float32{0.0, 0.0, -10.0, 0.0}
 	red := []float32{0.8, 0.8, 0.8, 1.0}
 
 	gl.ClearColor(0.2, 0.2, 0.2, 1.0)
@@ -186,13 +193,14 @@ func main() {
 
 	glfw.WindowHint(glfw.DepthBits, 16)
 
-	window, err := glfw.CreateWindow(Width, Height, Title, nil, nil)
+	window, err := glfw.CreateWindow(width, height, Title, nil, nil)
 
 	if err != nil {
 		panic(err)
 	}
 
 	window.SetFramebufferSizeCallback(reshape)
+	window.SetCursorPositionCallback(mouse)
 	window.SetKeyCallback(key)
 
 	window.MakeContextCurrent()

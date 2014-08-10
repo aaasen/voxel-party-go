@@ -31,7 +31,7 @@ func NewCamera(position glmath.Vec3) *Camera {
 		lookingAt: glmath.Vec3{0.0, 0.0, 0.0},
 		rotation:  glmath.Vec2{math.Pi / 2.0, math.Pi / 2.0},
 
-		rotationSpeed: 0.1,
+		rotationSpeed: 0.001,
 	}
 
 	camera.Tick()
