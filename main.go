@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/go-gl/gl"
 	glfw "github.com/go-gl/glfw3"
 	"github.com/go-gl/glu"
@@ -76,13 +75,16 @@ func draw() {
 
 	position := camera.GetPosition()
 
-	// x, y, z := camera.GetPosition().Elem()
-
-	fmt.Println(position)
-
 	target := camera.GetTarget()
 
 	glu.LookAt(position.X(), position.Y(), position.Z(), target.X(), target.Y(), target.Z(), 0, 1, 0)
+
+	if forward {
+		camera.MoveForward()
+	} else if backward {
+		camera.MoveBackward()
+	}
+
 	camera.Tick()
 
 	gl.PushMatrix()
@@ -90,38 +92,50 @@ func draw() {
 	gl.PopMatrix()
 }
 
-func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.ModifierKey) {
-	if action != glfw.Press {
-		return
-	}
+var (
+	forward  = false
+	backward = false
+	left     = false
+	right    = false
+	up       = false
+	down     = false
+)
 
+func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.ModifierKey) {
 	rotation := glmath.Vec2{0.0, 0.0}
 
-	switch glfw.Key(k) {
-	case glfw.KeyW:
-		camera.MoveForward()
-	case glfw.KeyS:
-		// positionZ -= positionSpeed
-	case glfw.KeyA:
-		// positionX += positionSpeed
-	case glfw.KeyD:
-		// positionX -= positionSpeed
-	case glfw.KeyQ:
-		// positionY += positionSpeed
-	case glfw.KeyE:
-		// positionY -= positionSpeed
-	case glfw.KeyEscape:
-		window.SetShouldClose(true)
-	case glfw.KeyUp:
-		rotation[0] -= 1.0
-	case glfw.KeyDown:
-		rotation[0] += 1.0
-	case glfw.KeyLeft:
-		rotation[1] -= 1.0
-	case glfw.KeyRight:
-		rotation[1] += 1.0
-	default:
-		return
+	if action == glfw.Press {
+		switch glfw.Key(k) {
+		case glfw.KeyW:
+			forward = true
+		case glfw.KeyS:
+			backward = true
+		case glfw.KeyA:
+			left = true
+		case glfw.KeyD:
+			right = true
+		case glfw.KeyEscape:
+			window.SetShouldClose(true)
+		case glfw.KeyUp:
+			rotation[0] -= 1.0
+		case glfw.KeyDown:
+			rotation[0] += 1.0
+		case glfw.KeyLeft:
+			rotation[1] -= 1.0
+		case glfw.KeyRight:
+			rotation[1] += 1.0
+		}
+	} else if action == glfw.Release {
+		switch glfw.Key(k) {
+		case glfw.KeyW:
+			forward = false
+		case glfw.KeyS:
+			backward = false
+		case glfw.KeyA:
+			left = false
+		case glfw.KeyD:
+			right = false
+		}
 	}
 
 	camera.Rotate(rotation)
