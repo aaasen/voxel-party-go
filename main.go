@@ -5,6 +5,12 @@ import (
 	glfw "github.com/go-gl/glfw3"
 )
 
+const (
+	Width  = 800
+	Height = 600
+	Title  = "Voxel Party"
+)
+
 func block() {
 	gl.ShadeModel(gl.FLAT)
 	gl.Normal3d(0.0, 0.0, 1.0)
@@ -20,11 +26,20 @@ func block() {
 }
 
 var (
-	rotationX float32 = 0.0
-	rotationY float32 = 0.0
-	rotationZ float32 = 0.0
-	block1    uint
-	angle     = 0.0
+	positionX     float32 = 0.0
+	positionY     float32 = 0.0
+	positionZ     float32 = 0.0
+	positionSpeed float32 = 1.0
+
+	rotationX     float32 = 0.0
+	rotationY     float32 = 0.0
+	rotationZ     float32 = 0.0
+	rotationSpeed float32 = 5.0
+)
+
+var (
+	block1 uint
+	angle  = 0.0
 )
 
 func draw() {
@@ -36,7 +51,7 @@ func draw() {
 	gl.Rotatef(rotationZ, 0.0, 0.0, 1.0)
 
 	gl.PushMatrix()
-	gl.Translated(0.0, 0.0, 0.0)
+	gl.Translatef(positionX, positionY, positionZ)
 	gl.CallList(block1)
 	gl.PopMatrix()
 
@@ -50,22 +65,34 @@ func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.M
 	}
 
 	switch glfw.Key(k) {
+	case glfw.KeyW:
+		positionZ += positionSpeed
+	case glfw.KeyS:
+		positionZ -= positionSpeed
+	case glfw.KeyA:
+		positionX += positionSpeed
+	case glfw.KeyD:
+		positionX -= positionSpeed
+	case glfw.KeyQ:
+		positionY += positionSpeed
+	case glfw.KeyE:
+		positionY -= positionSpeed
 	case glfw.KeyZ:
 		if mods&glfw.ModShift != 0 {
-			rotationZ -= 5.0
+			rotationZ -= rotationSpeed
 		} else {
-			rotationZ += 5.0
+			rotationZ += rotationSpeed
 		}
 	case glfw.KeyEscape:
 		window.SetShouldClose(true)
 	case glfw.KeyUp:
-		rotationX += 5.0
+		rotationX += rotationSpeed
 	case glfw.KeyDown:
-		rotationX -= 5.0
+		rotationX -= rotationSpeed
 	case glfw.KeyLeft:
-		rotationY += 5.0
+		rotationY += rotationSpeed
 	case glfw.KeyRight:
-		rotationY -= 5.0
+		rotationY -= rotationSpeed
 	default:
 		return
 	}
@@ -88,7 +115,6 @@ func reshape(window *glfw.Window, width, height int) {
 	gl.Translated(0.0, 0.0, -20.0)
 }
 
-// program & OpenGL initialization
 func Init() {
 	pos := []float32{5.0, 5.0, 10.0, 0.0}
 	red := []float32{0.8, 0.1, 0.0, 1.0}
@@ -120,7 +146,8 @@ func main() {
 
 	glfw.WindowHint(glfw.DepthBits, 16)
 
-	window, err := glfw.CreateWindow(800, 600, "Voxel Party", nil, nil)
+	window, err := glfw.CreateWindow(Width, Height, Title, nil, nil)
+
 	if err != nil {
 		panic(err)
 	}
