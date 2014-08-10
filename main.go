@@ -5,7 +5,7 @@ import (
 	glfw "github.com/go-gl/glfw3"
 	"github.com/go-gl/glu"
 	// glmath "github.com/go-gl/mathgl/mgl64"
-	// "math"
+	"math"
 )
 
 const (
@@ -66,10 +66,9 @@ var (
 	positionZ     = -10.0
 	positionSpeed = 1.0
 
-	rotationX     = 1.0
-	rotationY     = 1.0
-	rotationZ     = 0.0
-	rotationSpeed = 1.0
+	rotationX     = math.Pi / 2
+	rotationY     = math.Pi / 2
+	rotationSpeed = math.Pi / 32
 )
 
 var (
@@ -81,7 +80,9 @@ func draw() {
 
 	gl.LoadIdentity()
 
-	glu.LookAt(positionX, positionY, positionZ, positionX, positionY, positionZ+1.0, 0, 1, 0)
+	point := []float64{math.Cos(rotationY) * math.Sin(rotationX), math.Cos(rotationX), math.Sin(rotationY) * math.Sin(rotationX)}
+
+	glu.LookAt(positionX, positionY, positionZ, positionX+point[0], positionY+point[1], positionZ+point[2], 0, 1, 0)
 
 	gl.PushMatrix()
 	gl.CallList(block1)
@@ -106,22 +107,16 @@ func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.M
 		positionY += positionSpeed
 	case glfw.KeyE:
 		positionY -= positionSpeed
-	case glfw.KeyZ:
-		if mods&glfw.ModShift != 0 {
-			rotationZ -= rotationSpeed
-		} else {
-			rotationZ += rotationSpeed
-		}
 	case glfw.KeyEscape:
 		window.SetShouldClose(true)
 	case glfw.KeyUp:
-		rotationX += rotationSpeed
-	case glfw.KeyDown:
 		rotationX -= rotationSpeed
+	case glfw.KeyDown:
+		rotationX += rotationSpeed
 	case glfw.KeyLeft:
-		rotationY += rotationSpeed
-	case glfw.KeyRight:
 		rotationY -= rotationSpeed
+	case glfw.KeyRight:
+		rotationY += rotationSpeed
 	default:
 		return
 	}
