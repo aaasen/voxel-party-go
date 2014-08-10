@@ -1,11 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/go-gl/gl"
 	glfw "github.com/go-gl/glfw3"
 	"github.com/go-gl/glu"
-	// glmath "github.com/go-gl/mathgl/mgl64"
-	"math"
+	glmath "github.com/go-gl/mathgl/mgl64"
 )
 
 const (
@@ -61,14 +61,8 @@ func block() {
 }
 
 var (
-	positionX     = 1.0
-	positionY     = 0.0
-	positionZ     = -10.0
-	positionSpeed = 1.0
-
-	rotationX     = math.Pi / 2
-	rotationY     = math.Pi / 2
-	rotationSpeed = math.Pi / 32
+	initialPosition = glmath.Vec3{0.0, 0.0, -10.0}
+	camera          = NewCamera(initialPosition)
 )
 
 var (
@@ -80,9 +74,16 @@ func draw() {
 
 	gl.LoadIdentity()
 
-	point := []float64{math.Cos(rotationY) * math.Sin(rotationX), math.Cos(rotationX), math.Sin(rotationY) * math.Sin(rotationX)}
+	position := camera.GetPosition()
 
-	glu.LookAt(positionX, positionY, positionZ, positionX+point[0], positionY+point[1], positionZ+point[2], 0, 1, 0)
+	// x, y, z := camera.GetPosition().Elem()
+
+	fmt.Println(position)
+
+	target := camera.GetTarget()
+
+	glu.LookAt(position.X(), position.Y(), position.Z(), target.X(), target.Y(), target.Z(), 0, 1, 0)
+	camera.Tick()
 
 	gl.PushMatrix()
 	gl.CallList(block1)
@@ -94,32 +95,36 @@ func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.M
 		return
 	}
 
+	rotation := glmath.Vec2{0.0, 0.0}
+
 	switch glfw.Key(k) {
 	case glfw.KeyW:
-		positionZ += positionSpeed
+		camera.MoveForward()
 	case glfw.KeyS:
-		positionZ -= positionSpeed
+		// positionZ -= positionSpeed
 	case glfw.KeyA:
-		positionX += positionSpeed
+		// positionX += positionSpeed
 	case glfw.KeyD:
-		positionX -= positionSpeed
+		// positionX -= positionSpeed
 	case glfw.KeyQ:
-		positionY += positionSpeed
+		// positionY += positionSpeed
 	case glfw.KeyE:
-		positionY -= positionSpeed
+		// positionY -= positionSpeed
 	case glfw.KeyEscape:
 		window.SetShouldClose(true)
 	case glfw.KeyUp:
-		rotationX -= rotationSpeed
+		rotation[0] -= 1.0
 	case glfw.KeyDown:
-		rotationX += rotationSpeed
+		rotation[0] += 1.0
 	case glfw.KeyLeft:
-		rotationY -= rotationSpeed
+		rotation[1] -= 1.0
 	case glfw.KeyRight:
-		rotationY += rotationSpeed
+		rotation[1] += 1.0
 	default:
 		return
 	}
+
+	camera.Rotate(rotation)
 }
 
 func reshape(window *glfw.Window, width, height int) {
