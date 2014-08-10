@@ -90,6 +90,12 @@ func draw() {
 		camera.MoveBackward()
 	}
 
+	if left {
+		camera.MoveLeft()
+	} else if right {
+		camera.MoveRight()
+	}
+
 	camera.Tick()
 
 	gl.PushMatrix()

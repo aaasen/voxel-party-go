@@ -47,6 +47,14 @@ func (camera *Camera) MoveBackward() {
 	camera.acceleration = camera.acceleration.Sub(camera.getTargetUnit().Mul(camera.speed))
 }
 
+func (camera *Camera) MoveLeft() {
+	camera.acceleration = camera.acceleration.Sub(camera.getTargetUnit().Cross(glmath.Vec3{0.0, 1.0, 0.0}).Mul(camera.speed))
+}
+
+func (camera *Camera) MoveRight() {
+	camera.acceleration = camera.acceleration.Add(camera.getTargetUnit().Cross(glmath.Vec3{0.0, 1.0, 0.0}).Mul(camera.speed))
+}
+
 func (camera *Camera) Rotate(vec glmath.Vec2) {
 	camera.rotation = camera.rotation.Add(vec.Mul(camera.rotationSpeed))
 }
