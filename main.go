@@ -3,6 +3,9 @@ package main
 import (
 	"github.com/go-gl/gl"
 	glfw "github.com/go-gl/glfw3"
+	"github.com/go-gl/glu"
+	// glmath "github.com/go-gl/mathgl/mgl64"
+	// "math"
 )
 
 const (
@@ -12,53 +15,79 @@ const (
 )
 
 func block() {
-	gl.ShadeModel(gl.FLAT)
+	// gl.ShadeModel(gl.FLAT)
 	gl.Normal3d(0.0, 0.0, 1.0)
+
+	gl.Begin(gl.LINE)
+	gl.Color4f(1.0, 0.0, 0.0, 1.0)
+	gl.Vertex3f(0.5, -0.5, -0.5)
+	gl.Vertex3f(0.5, 0.5, -0.5)
+	gl.End()
 
 	gl.Begin(gl.QUADS)
 
-	gl.Vertex3f(-1, -1, 0)
-	gl.Vertex3f(1, -1, 0)
-	gl.Vertex3f(1, 1, 0)
-	gl.Vertex3f(-1, 1, 0)
+	gl.Color4f(1.0, 1.0, 1.0, 1.0)
+	gl.Vertex3f(0.5, -0.5, -0.5)
+	gl.Vertex3f(0.5, 0.5, -0.5)
+	gl.Vertex3f(-0.5, 0.5, -0.5)
+	gl.Vertex3f(-0.5, -0.5, -0.5)
+
+	gl.Vertex3f(0.5, -0.5, 0.5)
+	gl.Vertex3f(0.5, 0.5, 0.5)
+	gl.Vertex3f(-0.5, 0.5, 0.5)
+	gl.Vertex3f(-0.5, -0.5, 0.5)
+
+	gl.Vertex3f(0.5, -0.5, -0.5)
+	gl.Vertex3f(0.5, 0.5, -0.5)
+	gl.Vertex3f(0.5, 0.5, 0.5)
+	gl.Vertex3f(0.5, -0.5, 0.5)
+
+	gl.Vertex3f(-0.5, -0.5, 0.5)
+	gl.Vertex3f(-0.5, 0.5, 0.5)
+	gl.Vertex3f(-0.5, 0.5, -0.5)
+	gl.Vertex3f(-0.5, -0.5, -0.5)
+
+	gl.Vertex3f(0.5, 0.5, 0.5)
+	gl.Vertex3f(0.5, 0.5, -0.5)
+	gl.Vertex3f(-0.5, 0.5, -0.5)
+	gl.Vertex3f(-0.5, 0.5, 0.5)
+
+	gl.Vertex3f(0.5, -0.5, -0.5)
+	gl.Vertex3f(0.5, -0.5, 0.5)
+	gl.Vertex3f(-0.5, -0.5, 0.5)
+	gl.Vertex3f(-0.5, -0.5, -0.5)
 
 	gl.End()
 }
 
 var (
-	positionX     float32 = 0.0
-	positionY     float32 = 0.0
-	positionZ     float32 = 0.0
-	positionSpeed float32 = 1.0
+	positionX     = 1.0
+	positionY     = 0.0
+	positionZ     = -10.0
+	positionSpeed = 1.0
 
-	rotationX     float32 = 0.0
-	rotationY     float32 = 0.0
-	rotationZ     float32 = 0.0
-	rotationSpeed float32 = 5.0
+	rotationX     = 1.0
+	rotationY     = 1.0
+	rotationZ     = 0.0
+	rotationSpeed = 1.0
 )
 
 var (
 	block1 uint
-	angle  = 0.0
 )
 
 func draw() {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-	gl.PushMatrix()
-	gl.Rotatef(rotationX, 1.0, 0.0, 0.0)
-	gl.Rotatef(rotationY, 0.0, 1.0, 0.0)
-	gl.Rotatef(rotationZ, 0.0, 0.0, 1.0)
+	gl.LoadIdentity()
+
+	glu.LookAt(positionX, positionY, positionZ, positionX, positionY, positionZ+1.0, 0, 1, 0)
 
 	gl.PushMatrix()
-	gl.Translatef(positionX, positionY, positionZ)
 	gl.CallList(block1)
-	gl.PopMatrix()
-
 	gl.PopMatrix()
 }
 
-// change view angle, exit upon ESC
 func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.ModifierKey) {
 	if action != glfw.Press {
 		return
@@ -98,7 +127,6 @@ func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.M
 	}
 }
 
-// new window size
 func reshape(window *glfw.Window, width, height int) {
 	h := float64(height) / float64(width)
 
@@ -117,17 +145,15 @@ func reshape(window *glfw.Window, width, height int) {
 
 func Init() {
 	pos := []float32{5.0, 5.0, 10.0, 0.0}
-	red := []float32{0.8, 0.1, 0.0, 1.0}
-	// green := []float32{0.0, 0.8, 0.2, 1.0}
-	// blue := []float32{0.2, 0.2, 1.0, 1.0}
+	red := []float32{0.8, 0.8, 0.8, 1.0}
+
+	gl.ClearColor(0.2, 0.2, 0.2, 1.0)
 
 	gl.Lightfv(gl.LIGHT0, gl.POSITION, pos)
-	gl.Enable(gl.CULL_FACE)
 	gl.Enable(gl.LIGHTING)
 	gl.Enable(gl.LIGHT0)
 	gl.Enable(gl.DEPTH_TEST)
 
-	// make the gears
 	block1 = gl.GenLists(1)
 	gl.NewList(block1, gl.COMPILE)
 	gl.Materialfv(gl.FRONT, gl.AMBIENT_AND_DIFFUSE, red)
@@ -152,7 +178,6 @@ func main() {
 		panic(err)
 	}
 
-	// Set callback functions
 	window.SetFramebufferSizeCallback(reshape)
 	window.SetKeyCallback(key)
 
@@ -162,15 +187,11 @@ func main() {
 	width, height := window.GetFramebufferSize()
 	reshape(window, width, height)
 
-	// Parse command-line options
 	Init()
 
-	// Main loop
 	for !window.ShouldClose() {
-		// Draw gears
 		draw()
 
-		// Swap buffers
 		window.SwapBuffers()
 		glfw.PollEvents()
 	}
