@@ -36,43 +36,69 @@ func grid(x float32, y float32, z float32, d float32, n float32) {
 }
 
 func block() {
-	// gl.ShadeModel(gl.FLAT)
-	gl.Normal3d(0.0, 0.0, 1.0)
+	gl.ShadeModel(gl.FLAT)
 
-	gl.Begin(gl.QUADS)
+	n := 10
+
+	// gl.Normal3f(-10.0, 0.0, 0.0)
 
 	gl.Color4f(1.0, 1.0, 1.0, 1.0)
-	gl.Vertex3f(0.5, -0.5, -0.5)
-	gl.Vertex3f(0.5, 0.5, -0.5)
-	gl.Vertex3f(-0.5, 0.5, -0.5)
-	gl.Vertex3f(-0.5, -0.5, -0.5)
 
-	gl.Vertex3f(0.5, -0.5, 0.5)
-	gl.Vertex3f(0.5, 0.5, 0.5)
-	gl.Vertex3f(-0.5, 0.5, 0.5)
-	gl.Vertex3f(-0.5, -0.5, 0.5)
+	for x := 0; x < n; x++ {
+		for y := 0; y < n; y++ {
+			for z := 0; z < n; z++ {
 
-	gl.Vertex3f(0.5, -0.5, -0.5)
-	gl.Vertex3f(0.5, 0.5, -0.5)
-	gl.Vertex3f(0.5, 0.5, 0.5)
-	gl.Vertex3f(0.5, -0.5, 0.5)
+				gl.Translatef(-1.0, 0.0, 0.0)
 
-	gl.Vertex3f(-0.5, -0.5, 0.5)
-	gl.Vertex3f(-0.5, 0.5, 0.5)
-	gl.Vertex3f(-0.5, 0.5, -0.5)
-	gl.Vertex3f(-0.5, -0.5, -0.5)
+				gl.Begin(gl.QUADS)
 
-	gl.Vertex3f(0.5, 0.5, 0.5)
-	gl.Vertex3f(0.5, 0.5, -0.5)
-	gl.Vertex3f(-0.5, 0.5, -0.5)
-	gl.Vertex3f(-0.5, 0.5, 0.5)
+				// when looking down the z axis:
+				// front face
+				gl.Normal3d(0.0, 0.0, -1.0)
+				gl.Vertex3f(1.0, 0.0, 0.0)
+				gl.Vertex3f(1.0, 1.0, 0.0)
+				gl.Vertex3f(0.0, 1.0, 0.0)
+				gl.Vertex3f(0.0, 0.0, 0.0)
 
-	gl.Vertex3f(0.5, -0.5, -0.5)
-	gl.Vertex3f(0.5, -0.5, 0.5)
-	gl.Vertex3f(-0.5, -0.5, 0.5)
-	gl.Vertex3f(-0.5, -0.5, -0.5)
+				// back face
+				gl.Normal3d(0.0, 0.0, -1.0)
+				gl.Vertex3f(1.0, 0.0, 1.0)
+				gl.Vertex3f(1.0, 1.0, 1.0)
+				gl.Vertex3f(0.0, 1.0, 1.0)
+				gl.Vertex3f(0.0, 0.0, 1.0)
 
-	gl.End()
+				// right face
+				gl.Normal3d(1.0, 0.0, 1.0)
+				gl.Vertex3f(1.0, 0.0, 0.0)
+				gl.Vertex3f(1.0, 1.0, 0.0)
+				gl.Vertex3f(1.0, 1.0, 1.0)
+				gl.Vertex3f(1.0, 0.0, 1.0)
+
+				// left face
+				gl.Normal3d(-1.0, 0.0, 1.0)
+				gl.Vertex3f(0.0, 0.0, 1.0)
+				gl.Vertex3f(0.0, 1.0, 1.0)
+				gl.Vertex3f(0.0, 1.0, 0.0)
+				gl.Vertex3f(0.0, 0.0, 0.0)
+
+				// top face
+				gl.Normal3d(0.0, 1.0, 0.0)
+				gl.Vertex3f(1.0, 1.0, 1.0)
+				gl.Vertex3f(1.0, 1.0, 0.0)
+				gl.Vertex3f(0.0, 1.0, 0.0)
+				gl.Vertex3f(0.0, 1.0, 1.0)
+
+				// bottom face
+				gl.Normal3d(0.0, -1.0, 0.0)
+				gl.Vertex3f(1.0, 0.0, 0.0)
+				gl.Vertex3f(1.0, 0.0, 1.0)
+				gl.Vertex3f(0.0, 0.0, 1.0)
+				gl.Vertex3f(0.0, 0.0, 0.0)
+
+				gl.End()
+			}
+		}
+	}
 }
 
 var (
@@ -195,7 +221,7 @@ func reshape(window *glfw.Window, width, height int) {
 
 	znear := 5.0
 	zfar := 30.0
-	xmax := znear * 0.5
+	xmax := znear * 1.0
 
 	gl.Viewport(0, 0, width, height)
 	gl.MatrixMode(gl.PROJECTION)
