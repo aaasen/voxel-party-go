@@ -139,9 +139,11 @@ func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.M
 		case glfw.KeyD:
 			right = true
 		case glfw.KeySpace:
-			println(mods)
-
-			up = true
+			if mods == glfw.ModShift {
+				down = true
+			} else {
+				up = true
+			}
 		case glfw.KeyEscape:
 			window.SetShouldClose(true)
 		}
@@ -156,7 +158,11 @@ func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.M
 		case glfw.KeyD:
 			right = false
 		case glfw.KeySpace:
-			up = false
+			if mods == glfw.ModShift {
+				down = false
+			} else {
+				up = false
+			}
 		}
 	}
 }
