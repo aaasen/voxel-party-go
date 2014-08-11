@@ -237,8 +237,20 @@ func Init() {
 	gl.Enable(gl.LIGHT0)
 	gl.Enable(gl.DEPTH_TEST)
 
-	manager.add(NewChunk([]float32{0.0, 0.0, 0.0}))
-	manager.add(NewChunk([]float32{16.0, 0.0, 0.0}))
+	n := 2
+
+	for x := 0; x < n; x++ {
+		for y := 0; y < n; y++ {
+			for z := 0; z < n; z++ {
+				position := glmath.Vec3{float64(x), float64(y), float64(z)}
+
+				manager.add(NewChunk(position.Mul(16.0)))
+			}
+		}
+	}
+
+	// manager.add(NewChunk([]float32{16.0, 0.0, 0.0}))
+	// manager.add(NewChunk([]float32{16.0, 0.0, 0.0}))
 
 	gl.Enable(gl.NORMALIZE)
 }

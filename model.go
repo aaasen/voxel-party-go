@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/go-gl/gl"
+	glmath "github.com/go-gl/mathgl/mgl64"
 	"math/rand"
 )
 
@@ -88,10 +89,10 @@ const (
 
 type Chunk struct {
 	blocks   [chunkWidth][chunkWidth][chunkWidth]Block
-	position []float32
+	position glmath.Vec3
 }
 
-func NewChunk(position []float32) *Chunk {
+func NewChunk(position glmath.Vec3) *Chunk {
 	return &Chunk{
 		blocks:   makeBlocks(),
 		position: position,
@@ -105,10 +106,10 @@ func (chunk *Chunk) draw() {
 		for y := 0; y < chunkHeight; y++ {
 			for z := 0; z < chunkDepth; z++ {
 				gl.PushMatrix()
-				gl.Translatef(chunk.position[0], chunk.position[1], chunk.position[2])
+				gl.Translated(chunk.position.X(), chunk.position.Y(), chunk.position.Z())
 
 				gl.PushMatrix()
-				gl.Translatef(float32(x), float32(y), float32(z))
+				gl.Translated(float64(x), float64(y), float64(z))
 
 				block := chunk.blocks[x][y][z]
 				block.draw()
