@@ -48,7 +48,9 @@ func block() {
 		for y := 0; y < n; y++ {
 			for z := 0; z < n; z++ {
 
-				gl.Translatef(-1.0, 0.0, 0.0)
+				gl.PushMatrix()
+
+				gl.Translatef(float32(x), float32(y), float32(z))
 
 				gl.Begin(gl.QUADS)
 
@@ -96,6 +98,8 @@ func block() {
 				gl.Vertex3f(0.0, 0.0, 0.0)
 
 				gl.End()
+
+				gl.PopMatrix()
 			}
 		}
 	}
@@ -229,7 +233,6 @@ func reshape(window *glfw.Window, width, height int) {
 	gl.Frustum(-xmax, xmax, -xmax*h, xmax*h, znear, zfar)
 	gl.MatrixMode(gl.MODELVIEW)
 	gl.LoadIdentity()
-	gl.Translated(0.0, 0.0, -20.0)
 }
 
 func Init() {
