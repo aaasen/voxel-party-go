@@ -87,12 +87,14 @@ const (
 )
 
 type Chunk struct {
-	blocks [chunkWidth][chunkWidth][chunkWidth]Block
+	blocks   [chunkWidth][chunkWidth][chunkWidth]Block
+	position []float32
 }
 
-func NewChunk() *Chunk {
+func NewChunk(position []float32) *Chunk {
 	return &Chunk{
-		blocks: makeBlocks(),
+		blocks:   makeBlocks(),
+		position: position,
 	}
 }
 
@@ -103,10 +105,15 @@ func (chunk *Chunk) draw() {
 		for y := 0; y < chunkHeight; y++ {
 			for z := 0; z < chunkDepth; z++ {
 				gl.PushMatrix()
+				gl.Translatef(chunk.position[0], chunk.position[1], chunk.position[2])
+
+				gl.PushMatrix()
 				gl.Translatef(float32(x), float32(y), float32(z))
 
 				block := chunk.blocks[x][y][z]
 				block.draw()
+
+				gl.PopMatrix()
 
 				gl.PopMatrix()
 			}

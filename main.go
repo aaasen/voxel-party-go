@@ -142,15 +142,7 @@ func draw() {
 	camera.Tick()
 
 	gl.PushMatrix()
-
 	manager.draw()
-
-	// gl.Disable(gl.LIGHTING)
-	// gl.CallList(grid1)
-
-	// gl.Enable(gl.LIGHTING)
-	// gl.CallList(chunk1)
-
 	gl.PopMatrix()
 }
 
@@ -222,8 +214,8 @@ func reshape(window *glfw.Window, width, height int) {
 
 	h := float64(height) / float64(width)
 
-	znear := 5.0
-	zfar := 30.0
+	znear := 1.0
+	zfar := 100.0
 	xmax := znear * 1.0
 
 	gl.Viewport(0, 0, width, height)
@@ -245,7 +237,8 @@ func Init() {
 	gl.Enable(gl.LIGHT0)
 	gl.Enable(gl.DEPTH_TEST)
 
-	manager.add(NewChunk())
+	manager.add(NewChunk([]float32{0.0, 0.0, 0.0}))
+	manager.add(NewChunk([]float32{16.0, 0.0, 0.0}))
 
 	gl.Enable(gl.NORMALIZE)
 }
