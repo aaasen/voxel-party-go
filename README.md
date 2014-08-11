@@ -1,3 +1,4 @@
+# Voxel Party
 
 ## Installation
 
