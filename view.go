@@ -15,6 +15,8 @@ type DisplayList struct {
 }
 
 func (list *DisplayList) draw() {
+	list.setLighting()
+
 	gl.CallList(list.id)
 }
 
