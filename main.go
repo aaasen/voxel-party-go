@@ -18,15 +18,26 @@ var (
 	centerY = float64(height) / 2.0
 )
 
+func grid(x float32, y float32, z float32, d float32, n float32) {
+	width := d / n
+
+	gl.Begin(gl.LINES)
+	gl.Color3f(1.0, 1.0, 1.0)
+
+	for i := -n; i <= n; i += 1.0 {
+		gl.Vertex3f(x+width*i, y, z-d)
+		gl.Vertex3f(x+width*i, y, z+d)
+
+		gl.Vertex3f(x-d, y, z+width*i)
+		gl.Vertex3f(x+d, y, z+width*i)
+	}
+
+	gl.End()
+}
+
 func block() {
 	// gl.ShadeModel(gl.FLAT)
 	gl.Normal3d(0.0, 0.0, 1.0)
-
-	gl.Begin(gl.LINE)
-	gl.Color4f(1.0, 0.0, 0.0, 1.0)
-	gl.Vertex3f(0.5, -0.5, -0.5)
-	gl.Vertex3f(0.5, 0.5, -0.5)
-	gl.End()
 
 	gl.Begin(gl.QUADS)
 
@@ -71,6 +82,7 @@ var (
 
 var (
 	block1 uint
+	grid1  uint
 )
 
 func draw() {
@@ -105,7 +117,13 @@ func draw() {
 	camera.Tick()
 
 	gl.PushMatrix()
+
+	gl.Disable(gl.LIGHTING)
+	gl.CallList(grid1)
+
+	gl.Enable(gl.LIGHTING)
 	gl.CallList(block1)
+
 	gl.PopMatrix()
 }
 
@@ -203,6 +221,11 @@ func Init() {
 	gl.NewList(block1, gl.COMPILE)
 	gl.Materialfv(gl.FRONT, gl.AMBIENT_AND_DIFFUSE, red)
 	block()
+	gl.EndList()
+
+	grid1 = gl.GenLists(2)
+	gl.NewList(grid1, gl.COMPILE)
+	grid(0.0, 0.0, 0.0, 10.0, 10.0)
 	gl.EndList()
 
 	gl.Enable(gl.NORMALIZE)
