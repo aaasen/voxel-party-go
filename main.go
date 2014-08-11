@@ -84,16 +84,22 @@ func draw() {
 
 	glu.LookAt(position.X(), position.Y(), position.Z(), target.X(), target.Y(), target.Z(), 0, 1, 0)
 
-	if forward {
-		camera.MoveForward()
-	} else if backward {
-		camera.MoveBackward()
+	if forward && !backward {
+		camera.MoveForward(1.0)
+	} else if backward && !forward {
+		camera.MoveForward(-1.0)
 	}
 
-	if left {
-		camera.MoveLeft()
-	} else if right {
-		camera.MoveRight()
+	if right && !left {
+		camera.MoveRight(-1.0)
+	} else if left && !right {
+		camera.MoveRight(1.0)
+	}
+
+	if up && !down {
+		camera.MoveUp(1.0)
+	} else if down && !up {
+		camera.MoveUp(-1.0)
 	}
 
 	camera.Tick()
@@ -132,6 +138,10 @@ func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.M
 			left = true
 		case glfw.KeyD:
 			right = true
+		case glfw.KeySpace:
+			println(mods)
+
+			up = true
 		case glfw.KeyEscape:
 			window.SetShouldClose(true)
 		}
@@ -145,6 +155,8 @@ func key(window *glfw.Window, k glfw.Key, s int, action glfw.Action, mods glfw.M
 			left = false
 		case glfw.KeyD:
 			right = false
+		case glfw.KeySpace:
+			up = false
 		}
 	}
 }
