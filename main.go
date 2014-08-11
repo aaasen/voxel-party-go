@@ -35,74 +35,69 @@ func grid(x float32, y float32, z float32, d float32, n float32) {
 	gl.End()
 }
 
-func block() {
+func chunk() {
 	gl.ShadeModel(gl.FLAT)
 
 	n := 10
-
-	// gl.Normal3f(-10.0, 0.0, 0.0)
 
 	gl.Color4f(1.0, 1.0, 1.0, 1.0)
 
 	for x := 0; x < n; x++ {
 		for y := 0; y < n; y++ {
 			for z := 0; z < n; z++ {
-
-				gl.PushMatrix()
-
-				gl.Translatef(float32(x), float32(y), float32(z))
-
-				gl.Begin(gl.QUADS)
-
-				// when looking down the z axis:
-				// front face
-				gl.Normal3d(0.0, 0.0, -1.0)
-				gl.Vertex3f(1.0, 0.0, 0.0)
-				gl.Vertex3f(1.0, 1.0, 0.0)
-				gl.Vertex3f(0.0, 1.0, 0.0)
-				gl.Vertex3f(0.0, 0.0, 0.0)
-
-				// back face
-				gl.Normal3d(0.0, 0.0, -1.0)
-				gl.Vertex3f(1.0, 0.0, 1.0)
-				gl.Vertex3f(1.0, 1.0, 1.0)
-				gl.Vertex3f(0.0, 1.0, 1.0)
-				gl.Vertex3f(0.0, 0.0, 1.0)
-
-				// right face
-				gl.Normal3d(1.0, 0.0, 1.0)
-				gl.Vertex3f(1.0, 0.0, 0.0)
-				gl.Vertex3f(1.0, 1.0, 0.0)
-				gl.Vertex3f(1.0, 1.0, 1.0)
-				gl.Vertex3f(1.0, 0.0, 1.0)
-
-				// left face
-				gl.Normal3d(-1.0, 0.0, 1.0)
-				gl.Vertex3f(0.0, 0.0, 1.0)
-				gl.Vertex3f(0.0, 1.0, 1.0)
-				gl.Vertex3f(0.0, 1.0, 0.0)
-				gl.Vertex3f(0.0, 0.0, 0.0)
-
-				// top face
-				gl.Normal3d(0.0, 1.0, 0.0)
-				gl.Vertex3f(1.0, 1.0, 1.0)
-				gl.Vertex3f(1.0, 1.0, 0.0)
-				gl.Vertex3f(0.0, 1.0, 0.0)
-				gl.Vertex3f(0.0, 1.0, 1.0)
-
-				// bottom face
-				gl.Normal3d(0.0, -1.0, 0.0)
-				gl.Vertex3f(1.0, 0.0, 0.0)
-				gl.Vertex3f(1.0, 0.0, 1.0)
-				gl.Vertex3f(0.0, 0.0, 1.0)
-				gl.Vertex3f(0.0, 0.0, 0.0)
-
-				gl.End()
-
-				gl.PopMatrix()
+				cube(float32(x), float32(y), float32(z))
 			}
 		}
 	}
+}
+
+func cube(x, y, z float32) {
+	gl.Begin(gl.QUADS)
+
+	// when looking down the z axis:
+	// front face
+	gl.Normal3d(0.0, 0.0, -1.0)
+	gl.Vertex3f(1.0, 0.0, 0.0)
+	gl.Vertex3f(1.0, 1.0, 0.0)
+	gl.Vertex3f(0.0, 1.0, 0.0)
+	gl.Vertex3f(0.0, 0.0, 0.0)
+
+	// back face
+	gl.Normal3d(0.0, 0.0, -1.0)
+	gl.Vertex3f(1.0, 0.0, 1.0)
+	gl.Vertex3f(1.0, 1.0, 1.0)
+	gl.Vertex3f(0.0, 1.0, 1.0)
+	gl.Vertex3f(0.0, 0.0, 1.0)
+
+	// right face
+	gl.Normal3d(1.0, 0.0, 1.0)
+	gl.Vertex3f(1.0, 0.0, 0.0)
+	gl.Vertex3f(1.0, 1.0, 0.0)
+	gl.Vertex3f(1.0, 1.0, 1.0)
+	gl.Vertex3f(1.0, 0.0, 1.0)
+
+	// left face
+	gl.Normal3d(-1.0, 0.0, 1.0)
+	gl.Vertex3f(0.0, 0.0, 1.0)
+	gl.Vertex3f(0.0, 1.0, 1.0)
+	gl.Vertex3f(0.0, 1.0, 0.0)
+	gl.Vertex3f(0.0, 0.0, 0.0)
+
+	// top face
+	gl.Normal3d(0.0, 1.0, 0.0)
+	gl.Vertex3f(1.0, 1.0, 1.0)
+	gl.Vertex3f(1.0, 1.0, 0.0)
+	gl.Vertex3f(0.0, 1.0, 0.0)
+	gl.Vertex3f(0.0, 1.0, 1.0)
+
+	// bottom face
+	gl.Normal3d(0.0, -1.0, 0.0)
+	gl.Vertex3f(1.0, 0.0, 0.0)
+	gl.Vertex3f(1.0, 0.0, 1.0)
+	gl.Vertex3f(0.0, 0.0, 1.0)
+	gl.Vertex3f(0.0, 0.0, 0.0)
+
+	gl.End()
 }
 
 var (
@@ -111,7 +106,7 @@ var (
 )
 
 var (
-	block1 uint
+	chunk1 uint
 	grid1  uint
 )
 
@@ -148,11 +143,13 @@ func draw() {
 
 	gl.PushMatrix()
 
-	gl.Disable(gl.LIGHTING)
-	gl.CallList(grid1)
+	manager.draw()
 
-	gl.Enable(gl.LIGHTING)
-	gl.CallList(block1)
+	// gl.Disable(gl.LIGHTING)
+	// gl.CallList(grid1)
+
+	// gl.Enable(gl.LIGHTING)
+	// gl.CallList(chunk1)
 
 	gl.PopMatrix()
 }
@@ -164,6 +161,8 @@ var (
 	right    = false
 	up       = false
 	down     = false
+
+	manager = NewDisplayListManager()
 )
 
 func mouse(window *glfw.Window, xpos, ypos float64) {
@@ -237,7 +236,7 @@ func reshape(window *glfw.Window, width, height int) {
 
 func Init() {
 	pos := []float32{0.0, 0.0, -10.0, 0.0}
-	red := []float32{0.8, 0.8, 0.8, 1.0}
+	// red := []float32{0.8, 0.8, 0.8, 1.0}
 
 	gl.ClearColor(0.2, 0.2, 0.2, 1.0)
 
@@ -246,16 +245,7 @@ func Init() {
 	gl.Enable(gl.LIGHT0)
 	gl.Enable(gl.DEPTH_TEST)
 
-	block1 = gl.GenLists(1)
-	gl.NewList(block1, gl.COMPILE)
-	gl.Materialfv(gl.FRONT, gl.AMBIENT_AND_DIFFUSE, red)
-	block()
-	gl.EndList()
-
-	grid1 = gl.GenLists(2)
-	gl.NewList(grid1, gl.COMPILE)
-	grid(0.0, 0.0, 0.0, 10.0, 10.0)
-	gl.EndList()
+	manager.add(NewChunk())
 
 	gl.Enable(gl.NORMALIZE)
 }

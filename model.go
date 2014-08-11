@@ -64,6 +64,10 @@ func (*Block) draw() {
 	gl.End()
 }
 
+func (block *Block) lighting() bool {
+	return true
+}
+
 const (
 	chunkWidth  = 16
 	chunkHeight = 16
@@ -96,6 +100,10 @@ func (chunk *Chunk) draw() {
 			}
 		}
 	}
+}
+
+func (chunk *Chunk) lighting() bool {
+	return true
 }
 
 func makeBlocks() [chunkWidth][chunkWidth][chunkWidth]Block {
