@@ -129,6 +129,7 @@ const (
 type ChunkManager struct {
 	listManager    *DisplayListManager
 	chunks         map[string]*Chunk
+	ids			   map[string]uint
 	renderDistance int
 	lastPosition   ChunkCoordinate
 }
@@ -169,6 +170,7 @@ func NewChunkManager(listManager *DisplayListManager) *ChunkManager {
 	return &ChunkManager{
 		listManager:    listManager,
 		chunks:         make(map[string]*Chunk),
+		ids: 			make(map[string]uint),
 		renderDistance: DefaultRenderDistance,
 		lastPosition:   nil,
 	}
@@ -181,13 +183,16 @@ func (manager *ChunkManager) update(position glmath.Vec3) {
 		chunksToLoad := chunksWithinDistance(chunkCoordinate, manager.renderDistance)
 
 		for _, chunkCoord := range chunksToLoad {
-			_, ok := manager.chunks[chunkCoord.Id()]
+			id := chunkCoord.Id()
+
+			_, ok := manager.chunks[id]
 
 			if !ok {
 				chunk := generateChunk(chunkCoord)
-				manager.listManager.add(chunk)
+				manager.chunks[id] = chunk
 
-				manager.chunks[chunkCoord.Id()] = chunk
+				listId := manager.listManager.add(chunk)
+				manager.ids[id] = listId
 			}
 		}
 
@@ -196,8 +201,14 @@ func (manager *ChunkManager) update(position glmath.Vec3) {
 			chunkIdsToLoad := idsFromCoords(chunksToLoad)
 
 			for _, toDestroy := range chunksToDestroy {
-				if !stringInSlice(toDestroy.Id(), chunkIdsToLoad) {
+				id := toDestroy.Id()
 
+				if !stringInSlice(id, chunkIdsToLoad) {
+					delete(manager.chunks, id)
+
+					listId := manager.ids[id]
+					manager.listManager.remove(listId)
+					delete(manager.ids, id)
 				}
 			}
 		}
