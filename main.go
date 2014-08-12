@@ -168,20 +168,6 @@ func Init() {
 	gl.Enable(gl.LIGHTING)
 	gl.Enable(gl.LIGHT0)
 	gl.Enable(gl.DEPTH_TEST)
-
-	n := 1
-
-	for x := 0; x < n; x++ {
-		for y := 0; y < n; y++ {
-			for z := 0; z < n; z++ {
-
-				// position := glmath.Vec3{float64(x), float64(y), float64(z)}
-
-				// listManager.add(NewChunk(position.Mul(16.0)))
-			}
-		}
-	}
-
 	gl.Enable(gl.NORMALIZE)
 }
 

@@ -151,6 +151,16 @@ func (coord ChunkCoordinate) Z() int {
 	return coord[2]
 }
 
+func idsFromCoords(coords []ChunkCoordinate) []string {
+	ids := make([]string, len(coords), len(coords))
+
+	for i, coord := range coords {
+		ids[i] = coord.Id()
+	}
+
+	return ids
+}
+
 func (coord ChunkCoordinate) Equals(other ChunkCoordinate) bool {
 	return coord.X() == other.X() && coord.Y() == other.Y() && coord.Z() == other.Z()
 }
@@ -167,7 +177,7 @@ func NewChunkManager(listManager *DisplayListManager) *ChunkManager {
 func (manager *ChunkManager) update(position glmath.Vec3) {
 	chunkCoordinate := toChunkCoordinates(position)
 
-	if manager.lastPosition == nil || chunkCoordinate.Equals(manager.lastPosition) {
+	if manager.lastPosition == nil || !chunkCoordinate.Equals(manager.lastPosition) {
 		chunksToLoad := chunksWithinDistance(chunkCoordinate, manager.renderDistance)
 
 		for _, chunkCoord := range chunksToLoad {
@@ -180,7 +190,30 @@ func (manager *ChunkManager) update(position glmath.Vec3) {
 				manager.chunks[chunkCoord.Id()] = chunk
 			}
 		}
+
+		if manager.lastPosition != nil {
+			chunksToDestroy := chunksWithinDistance(manager.lastPosition, manager.renderDistance)
+			chunkIdsToLoad := idsFromCoords(chunksToLoad)
+
+			for _, toDestroy := range chunksToDestroy {
+				if !stringInSlice(toDestroy.Id(), chunkIdsToLoad) {
+
+				}
+			}
+		}
+
+		manager.lastPosition = chunkCoordinate
 	}
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+
+	return false
 }
 
 func chunksWithinDistance(position ChunkCoordinate, distance int) []ChunkCoordinate {
