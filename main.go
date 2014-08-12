@@ -35,79 +35,9 @@ func grid(x float32, y float32, z float32, d float32, n float32) {
 	gl.End()
 }
 
-func chunk() {
-	gl.ShadeModel(gl.FLAT)
-
-	n := 10
-
-	gl.Color4f(1.0, 1.0, 1.0, 1.0)
-
-	for x := 0; x < n; x++ {
-		for y := 0; y < n; y++ {
-			for z := 0; z < n; z++ {
-				cube(float32(x), float32(y), float32(z))
-			}
-		}
-	}
-}
-
-func cube(x, y, z float32) {
-	gl.Begin(gl.QUADS)
-
-	// when looking down the z axis:
-	// front face
-	gl.Normal3d(0.0, 0.0, -1.0)
-	gl.Vertex3f(1.0, 0.0, 0.0)
-	gl.Vertex3f(1.0, 1.0, 0.0)
-	gl.Vertex3f(0.0, 1.0, 0.0)
-	gl.Vertex3f(0.0, 0.0, 0.0)
-
-	// back face
-	gl.Normal3d(0.0, 0.0, -1.0)
-	gl.Vertex3f(1.0, 0.0, 1.0)
-	gl.Vertex3f(1.0, 1.0, 1.0)
-	gl.Vertex3f(0.0, 1.0, 1.0)
-	gl.Vertex3f(0.0, 0.0, 1.0)
-
-	// right face
-	gl.Normal3d(1.0, 0.0, 1.0)
-	gl.Vertex3f(1.0, 0.0, 0.0)
-	gl.Vertex3f(1.0, 1.0, 0.0)
-	gl.Vertex3f(1.0, 1.0, 1.0)
-	gl.Vertex3f(1.0, 0.0, 1.0)
-
-	// left face
-	gl.Normal3d(-1.0, 0.0, 1.0)
-	gl.Vertex3f(0.0, 0.0, 1.0)
-	gl.Vertex3f(0.0, 1.0, 1.0)
-	gl.Vertex3f(0.0, 1.0, 0.0)
-	gl.Vertex3f(0.0, 0.0, 0.0)
-
-	// top face
-	gl.Normal3d(0.0, 1.0, 0.0)
-	gl.Vertex3f(1.0, 1.0, 1.0)
-	gl.Vertex3f(1.0, 1.0, 0.0)
-	gl.Vertex3f(0.0, 1.0, 0.0)
-	gl.Vertex3f(0.0, 1.0, 1.0)
-
-	// bottom face
-	gl.Normal3d(0.0, -1.0, 0.0)
-	gl.Vertex3f(1.0, 0.0, 0.0)
-	gl.Vertex3f(1.0, 0.0, 1.0)
-	gl.Vertex3f(0.0, 0.0, 1.0)
-	gl.Vertex3f(0.0, 0.0, 0.0)
-
-	gl.End()
-}
-
 var (
 	initialPosition = glmath.Vec3{0.0, 0.0, -10.0}
 	camera          = NewCamera(initialPosition)
-)
-
-var (
-	chunk1 uint
-	grid1  uint
 )
 
 func draw() {
@@ -116,10 +46,11 @@ func draw() {
 	gl.LoadIdentity()
 
 	position := camera.GetPosition()
-
 	target := camera.GetTarget()
 
 	glu.LookAt(position.X(), position.Y(), position.Z(), target.X(), target.Y(), target.Z(), 0, 1, 0)
+
+	chunkManager.update(position)
 
 	if forward && !backward {
 		camera.MoveForward(1.0)
@@ -142,7 +73,7 @@ func draw() {
 	camera.Tick()
 
 	gl.PushMatrix()
-	manager.draw()
+	listManager.draw()
 	gl.PopMatrix()
 }
 
@@ -154,7 +85,8 @@ var (
 	up       = false
 	down     = false
 
-	manager = NewDisplayListManager()
+	listManager  = NewDisplayListManager()
+	chunkManager = NewChunkManager(listManager)
 )
 
 func mouse(window *glfw.Window, xpos, ypos float64) {
@@ -237,20 +169,18 @@ func Init() {
 	gl.Enable(gl.LIGHT0)
 	gl.Enable(gl.DEPTH_TEST)
 
-	n := 2
+	n := 1
 
 	for x := 0; x < n; x++ {
 		for y := 0; y < n; y++ {
 			for z := 0; z < n; z++ {
-				position := glmath.Vec3{float64(x), float64(y), float64(z)}
 
-				manager.add(NewChunk(position.Mul(16.0)))
+				// position := glmath.Vec3{float64(x), float64(y), float64(z)}
+
+				// listManager.add(NewChunk(position.Mul(16.0)))
 			}
 		}
 	}
-
-	// manager.add(NewChunk([]float32{16.0, 0.0, 0.0}))
-	// manager.add(NewChunk([]float32{16.0, 0.0, 0.0}))
 
 	gl.Enable(gl.NORMALIZE)
 }

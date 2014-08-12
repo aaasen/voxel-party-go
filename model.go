@@ -1,9 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/go-gl/gl"
 	glmath "github.com/go-gl/mathgl/mgl64"
-	"math/rand"
+	"math"
 )
 
 const (
@@ -89,14 +90,7 @@ const (
 
 type Chunk struct {
 	blocks   [chunkWidth][chunkWidth][chunkWidth]Block
-	position glmath.Vec3
-}
-
-func NewChunk(position glmath.Vec3) *Chunk {
-	return &Chunk{
-		blocks:   makeBlocks(),
-		position: position,
-	}
+	position ChunkCoordinate
 }
 
 func (chunk *Chunk) draw() {
@@ -106,7 +100,9 @@ func (chunk *Chunk) draw() {
 		for y := 0; y < chunkHeight; y++ {
 			for z := 0; z < chunkDepth; z++ {
 				gl.PushMatrix()
-				gl.Translated(chunk.position.X(), chunk.position.Y(), chunk.position.Z())
+				position := chunk.position.toVector()
+
+				gl.Translated(position.X(), position.Y(), position.Z())
 
 				gl.PushMatrix()
 				gl.Translated(float64(x), float64(y), float64(z))
@@ -126,32 +122,89 @@ func (chunk *Chunk) lighting() bool {
 	return false
 }
 
-func makeBlocks() [chunkWidth][chunkWidth][chunkWidth]Block {
-	var blocks [chunkWidth][chunkHeight][chunkDepth]Block
+const (
+	DefaultRenderDistance = 1
+)
 
-	for x := 0; x < chunkWidth; x++ {
-		for y := 0; y < chunkHeight; y++ {
-			for z := 0; z < chunkDepth; z++ {
-				blockType := blue
+type ChunkManager struct {
+	listManager    *DisplayListManager
+	chunks         map[string]*Chunk
+	renderDistance int
+	lastPosition   ChunkCoordinate
+}
 
-				if x%2 == 0 {
-					blockType = red
-				}
+type ChunkCoordinate []int
 
-				if z%2 == 0 {
-					blockType = green
-				}
+func (coord *ChunkCoordinate) Id() string {
+	return fmt.Sprintf("%v:%v:%v", coord.X(), coord.Y(), coord.Z())
+}
 
-				active := false
+func (coord ChunkCoordinate) X() int {
+	return coord[0]
+}
 
-				if rand.Int31n(2) == 0 {
-					active = true
-				}
+func (coord ChunkCoordinate) Y() int {
+	return coord[1]
+}
 
-				blocks[x][y][z] = Block{active, blockType}
+func (coord ChunkCoordinate) Z() int {
+	return coord[2]
+}
+
+func (coord ChunkCoordinate) Equals(other ChunkCoordinate) bool {
+	return coord.X() == other.X() && coord.Y() == other.Y() && coord.Z() == other.Z()
+}
+
+func NewChunkManager(listManager *DisplayListManager) *ChunkManager {
+	return &ChunkManager{
+		listManager:    listManager,
+		chunks:         make(map[string]*Chunk),
+		renderDistance: DefaultRenderDistance,
+		lastPosition:   nil,
+	}
+}
+
+func (manager *ChunkManager) update(position glmath.Vec3) {
+	chunkCoordinate := toChunkCoordinates(position)
+
+	if manager.lastPosition == nil || chunkCoordinate.Equals(manager.lastPosition) {
+		chunksToLoad := chunksWithinDistance(chunkCoordinate, manager.renderDistance)
+
+		for _, chunkCoord := range chunksToLoad {
+			_, ok := manager.chunks[chunkCoord.Id()]
+
+			if !ok {
+				chunk := generateChunk(chunkCoord)
+				manager.listManager.add(chunk)
+
+				manager.chunks[chunkCoord.Id()] = chunk
 			}
 		}
 	}
+}
 
-	return blocks
+func chunksWithinDistance(position ChunkCoordinate, distance int) []ChunkCoordinate {
+	chunks := make([]ChunkCoordinate, 0, distance*distance*distance)
+
+	for x := -distance; x <= distance; x++ {
+		for z := -distance; z <= distance; z++ {
+			chunks = append(chunks, ChunkCoordinate{position.X() + x, position.Y(), position.Z() + z})
+		}
+	}
+
+	return chunks
+}
+
+func toChunkCoordinates(position glmath.Vec3) ChunkCoordinate {
+	return ChunkCoordinate{floorInt(position.X() / chunkWidth),
+		floorInt(position.Y() / chunkHeight),
+		floorInt(position.Z() / chunkDepth)}
+}
+
+func (position *ChunkCoordinate) toVector() glmath.Vec3 {
+	return glmath.Vec3{float64(position.X() * chunkWidth), float64(position.Y() * chunkHeight), float64(position.Z() * chunkDepth)}
+}
+
+func floorInt(x float64) int {
+	return int(math.Floor(x))
 }
